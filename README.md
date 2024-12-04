@@ -1,6 +1,6 @@
 # Base project
 
--   Caculator
+-   Calculator: https://jt-calculator.vercel.app/ (Link demo)
 
 # Intermediate project
 
