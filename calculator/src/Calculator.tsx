@@ -2,6 +2,8 @@ import { twMerge } from "tailwind-merge";
 import { FaDeleteLeft, FaDivide } from "react-icons/fa6";
 import { useCallback, useState } from "react";
 
+type Calculation = "operation" | "number" | "delete";
+
 const Calculator = () => {
     const [calculation, setCalculation] = useState("");
     const [result, setResult] = useState("");
@@ -13,63 +15,42 @@ const Calculator = () => {
         setResult("");
     }, []);
 
-    const addCalculation = useCallback(
-        (text: string) => {
-            const prevRs =
-                result.length > 0 && !isNaN(Number(result)) && text !== "delete"
-                    ? result
-                    : "";
-
-            if (
-                result.length > 0 &&
-                !isNaN(Number(result)) &&
-                text !== "delete"
-            ) {
+    const updateCalculation = useCallback(
+        (symbol: string, type: Calculation, result: string) => {
+            if (type === "number") {
                 setResult("");
+                setCalculation((prev) => prev + symbol);
             }
 
-            setCalculation((prev) => {
-                switch (text) {
-                    case "delete":
-                        return prev.slice(0, -1);
-                    case "division":
-                        return prevRs.length > 0
-                            ? prevRs + "/"
-                            : prev
-                            ? prev[-1] === "/"
-                                ? prev
-                                : prev.slice(0, -1) + "/"
-                            : "0" + "/";
-                    case "multiplication":
-                        return prevRs.length > 0
-                            ? prevRs + "*"
-                            : prev
-                            ? prev[-1] === "*"
-                                ? prev
-                                : prev.slice(0, -1) + "*"
-                            : "0" + "*";
-                    case "subtraction":
-                        return prevRs.length > 0
-                            ? prevRs + "-"
-                            : prev
-                            ? prev[-1] === "-"
-                                ? prev
-                                : prev.slice(0, -1) + "-"
-                            : "0" + "-";
-                    case "addition":
-                        return prevRs.length > 0
-                            ? prevRs + "+"
-                            : prev
-                            ? prev[-1] === "+"
-                                ? prev
-                                : prev.slice(0, -1) + "+"
-                            : "0" + "+";
-                    default:
-                        return prev + text;
+            if (type === "operation") {
+                if (
+                    calculation.length === 0 &&
+                    result &&
+                    !isNaN(Number(result))
+                ) {
+                    setCalculation(result + symbol);
+                    setResult("");
+                } else {
+                    setCalculation((prev) => {
+                        if (
+                            !isNaN(Number(prev[prev.length - 1])) ||
+                            prev[prev.length - 1] === "%"
+                        ) {
+                            return prev + symbol;
+                        } else {
+                            return prev
+                                ? prev.slice(0, -1) + symbol
+                                : "0" + symbol;
+                        }
+                    });
                 }
-            });
+            }
+
+            if (type === "delete") {
+                setCalculation((prev) => prev.slice(0, -1));
+            }
         },
-        [result]
+        [calculation]
     );
 
     const calculateResult = useCallback((calculation: string) => {
@@ -138,7 +119,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("%")}
+                    onClick={() => updateCalculation("%", "number", result)}
                 >
                     %
                 </button>
@@ -150,7 +131,9 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("delete")}
+                    onClick={() =>
+                        updateCalculation("delete", "delete", result)
+                    }
                 >
                     <FaDeleteLeft />
                 </button>
@@ -162,7 +145,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("division")}
+                    onClick={() => updateCalculation("/", "operation", result)}
                 >
                     <FaDivide />
                 </button>
@@ -174,7 +157,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("7")}
+                    onClick={() => updateCalculation("7", "number", result)}
                 >
                     7
                 </button>
@@ -186,7 +169,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("8")}
+                    onClick={() => updateCalculation("8", "number", result)}
                 >
                     8
                 </button>
@@ -198,7 +181,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("9")}
+                    onClick={() => updateCalculation("9", "number", result)}
                 >
                     9
                 </button>
@@ -210,7 +193,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("multiplication")}
+                    onClick={() => updateCalculation("*", "operation", result)}
                 >
                     X
                 </button>
@@ -222,7 +205,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("4")}
+                    onClick={() => updateCalculation("4", "number", result)}
                 >
                     4
                 </button>
@@ -234,7 +217,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("5")}
+                    onClick={() => updateCalculation("5", "number", result)}
                 >
                     5
                 </button>
@@ -246,7 +229,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("6")}
+                    onClick={() => updateCalculation("6", "number", result)}
                 >
                     6
                 </button>
@@ -258,7 +241,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("subtraction")}
+                    onClick={() => updateCalculation("-", "operation", result)}
                 >
                     -
                 </button>
@@ -270,7 +253,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("1")}
+                    onClick={() => updateCalculation("1", "number", result)}
                 >
                     1
                 </button>
@@ -282,7 +265,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("2")}
+                    onClick={() => updateCalculation("2", "number", result)}
                 >
                     2
                 </button>
@@ -294,7 +277,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("3")}
+                    onClick={() => updateCalculation("3", "number", result)}
                 >
                     3
                 </button>
@@ -306,7 +289,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("addition")}
+                    onClick={() => updateCalculation("+", "operation", result)}
                 >
                     +
                 </button>
@@ -318,7 +301,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("00")}
+                    onClick={() => updateCalculation("00", "number", result)}
                 >
                     00
                 </button>
@@ -330,7 +313,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation("0")}
+                    onClick={() => updateCalculation("0", "number", result)}
                 >
                     0
                 </button>
@@ -342,7 +325,7 @@ const Calculator = () => {
                         "rounded-xl",
                         "font-medium"
                     )}
-                    onClick={() => addCalculation(".")}
+                    onClick={() => updateCalculation(".", "number", result)}
                 >
                     .
                 </button>
