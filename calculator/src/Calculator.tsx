@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { FaDeleteLeft, FaDivide } from "react-icons/fa6";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type Calculation = "operation" | "number" | "delete";
 
@@ -54,6 +54,8 @@ const Calculator = () => {
     );
 
     const calculateResult = useCallback((calculation: string) => {
+        if (!calculation) return;
+
         try {
             const expression = calculation.replace(/%/g, "/100");
 
@@ -70,6 +72,73 @@ const Calculator = () => {
             setCalculation("NaN");
         }
     }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const key = e.key;
+            console.log(key);
+
+            switch (key) {
+                case "0":
+                    updateCalculation("0", "number", result);
+                    break;
+                case "1":
+                    updateCalculation("1", "number", result);
+                    break;
+                case "2":
+                    updateCalculation("2", "number", result);
+                    break;
+                case "3":
+                    updateCalculation("3", "number", result);
+                    break;
+                case "4":
+                    updateCalculation("4", "number", result);
+                    break;
+                case "5":
+                    updateCalculation("5", "number", result);
+                    break;
+                case "6":
+                    updateCalculation("6", "number", result);
+                    break;
+                case "7":
+                    updateCalculation("7", "number", result);
+                    break;
+                case "8":
+                    updateCalculation("8", "number", result);
+                    break;
+                case "9":
+                    updateCalculation("9", "number", result);
+                    break;
+                case "Backspace":
+                    updateCalculation("delete", "delete", result);
+                    break;
+                case "+":
+                    updateCalculation("+", "operation", result);
+                    break;
+                case "-":
+                    updateCalculation("-", "operation", result);
+                    break;
+                case "*":
+                    updateCalculation("*", "operation", result);
+                    break;
+                case "/":
+                    updateCalculation("/", "operation", result);
+                    break;
+                case "Enter":
+                    calculateResult(calculation);
+                    break;
+                case "=":
+                    calculateResult(calculation);
+                    break;
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [result, calculation, updateCalculation, calculateResult]);
 
     return (
         <div
