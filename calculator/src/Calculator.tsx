@@ -18,7 +18,7 @@ const Calculator = () => {
     const updateCalculation = useCallback(
         (symbol: string, type: Calculation, result: string) => {
             if (type === "number") {
-                setResult("");
+                if (result.length > 0) setResult("");
                 setCalculation((prev) => prev + symbol);
             }
 
@@ -76,7 +76,6 @@ const Calculator = () => {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const key = e.key;
-            console.log(key);
 
             switch (key) {
                 case "0":
@@ -108,6 +107,12 @@ const Calculator = () => {
                     break;
                 case "9":
                     updateCalculation("9", "number", result);
+                    break;
+                case "%":
+                    updateCalculation("%", "number", result);
+                    break;
+                case ".":
+                    updateCalculation(".", "number", result);
                     break;
                 case "Backspace":
                     updateCalculation("delete", "delete", result);
